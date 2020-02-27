@@ -19,7 +19,6 @@
 package com.gabriel.file_random_number;
 
 import java.awt.Color;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -35,16 +34,19 @@ import javax.swing.JFileChooser;
  * la gestione del file con i dati e le statistiche dei dati.
  * 
  * @author Gabriel Duta
- * @version 1.0
+ * @version 2.0
  */
 public class GUI_dati extends javax.swing.JFrame {
 
+    Color defaultBackground;
     /**
      * Creates new form GUI_dati
      */
     public GUI_dati() {
         initComponents();
         this.setLocation(500, 200);
+        
+        // collegamento dell'ascoltatore del bottone Open Fie all'ascoltatore del MenuItem
         openFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openActionPerformed(evt);
@@ -56,6 +58,9 @@ public class GUI_dati extends javax.swing.JFrame {
         // setup jLable filePath
         filePath.setForeground(Color.gray);
         filePath.setEditable(false);
+        
+        defaultBackground = this.getContentPane().getBackground();
+        darkMode(true);
     }
 
     /**
@@ -68,7 +73,6 @@ public class GUI_dati extends javax.swing.JFrame {
     private void initComponents() {
 
         fileChooser = new javax.swing.JFileChooser();
-        fileName = new javax.swing.JDialog();
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
         generateFile = new javax.swing.JToggleButton();
@@ -82,36 +86,25 @@ public class GUI_dati extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         delta = new javax.swing.JLabel();
         filePath = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        computeButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         open = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         exit = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
         jMenu3 = new javax.swing.JMenu();
         help = new javax.swing.JMenuItem();
         about = new javax.swing.JMenuItem();
 
         fileChooser.setFileFilter(new MyCustomFilter());
 
-        fileName.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        fileName.setTitle("File name");
-        fileName.setAlwaysOnTop(true);
-
-        javax.swing.GroupLayout fileNameLayout = new javax.swing.GroupLayout(fileName.getContentPane());
-        fileName.getContentPane().setLayout(fileNameLayout);
-        fileNameLayout.setHorizontalGroup(
-            fileNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        fileNameLayout.setVerticalGroup(
-            fileNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Random numbers from file analisis");
+
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         textArea.setColumns(20);
         textArea.setRows(5);
@@ -144,10 +137,10 @@ public class GUI_dati extends javax.swing.JFrame {
 
         filePath.setText("File Path");
 
-        jButton1.setText("Compute");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        computeButton.setText("Compute");
+        computeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                computeButtonActionPerformed(evt);
             }
         });
 
@@ -175,6 +168,25 @@ public class GUI_dati extends javax.swing.JFrame {
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setText("Compute");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem1);
+
+        jCheckBoxMenuItem1.setSelected(true);
+        jCheckBoxMenuItem1.setText("Dark mode");
+        jCheckBoxMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jCheckBoxMenuItem1);
+
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("?");
@@ -200,8 +212,7 @@ public class GUI_dati extends javax.swing.JFrame {
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(delta, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(filePath, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
+                    .addComponent(computeButton)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -214,14 +225,15 @@ public class GUI_dati extends javax.swing.JFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(minimo, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-                                .addComponent(massimo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                .addGap(33, 33, 33)
+                                .addComponent(massimo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(filePath, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(openFile)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(generateFile)))
+                        .addGap(18, 18, 18)
+                        .addComponent(generateFile))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -235,11 +247,11 @@ public class GUI_dati extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(computeButton)
+                        .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
                             .addComponent(media))
@@ -261,12 +273,18 @@ public class GUI_dati extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Metodo che apre la finestra del file chooser e mostra il contenuto del file scelto
+     * nella textArea.
+     * 
+     * @param evt 
+     */
     private void openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openActionPerformed
-        int returnVal = fileChooser.showOpenDialog(this);
+        int returnVal = fileChooser.showOpenDialog(this); // apre la finestra del file chooser
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
+            File file = fileChooser.getSelectedFile(); // passa all'istanza file il file scelto nel file chooser
             try {
-              // What to do with the file, e.g. display it in a TextArea
+              // Mostra il contenuto del file e il suo path
               textArea.read( new FileReader( file.getAbsolutePath() ), null );
               filePath.setText(file.getAbsolutePath());
             } catch (IOException ex) {
@@ -282,16 +300,38 @@ public class GUI_dati extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_exitActionPerformed
 
+    /**
+     * Genera un file riempiendolo con 100 numeri casuali compresi tra -30 e 40.
+     * I file generati hanno nome simile ma terminano con un numero crescente.
+     * @param evt 
+     */
     private void generateFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateFileActionPerformed
-        BufferedWriter bw = null;
-        File f = new File("./Prova.na");
-        Random rnd = new Random();
-        try {
-            bw = new BufferedWriter(new FileWriter(f));
-            for (int i = 0; i < 100; i++) {
-                bw.write(Integer.toString((rnd.nextInt(70) - 30)));
-                bw.newLine();
+        int j = 0;
+        String nomeF = "RandomNumbers";
+        BufferedWriter bw;
+        
+        // Le seguenti righe servono a creare i file generati dal jButton "Generate File" mettendoli
+        // in ordine crescente, tenendo in considerazione anche i file già presenti nella directory.
+        File inDir[] = new File("./").listFiles(); // mette nel vettore tutti i file presenti nella directory.
+        for (File file : inDir) {
+            String nome = file.getName();
+            if(nome.indexOf(nomeF) == 0) { // controlla che il nome del file inizi con "RandomNumbers"
+                try { // Questo try permette di controllare che nel nome del file non ci siano altri caratteri, in quel
+                      // caso non verrebbe considerato nella conta.
+                      // Inoltre trova il numero maggiore perchè inDir non ha i file ordinati.
+                    int num = Integer.valueOf(nome.substring(nome.lastIndexOf(nomeF) + 13, nome.indexOf(".na")));
+                    if(num > j)
+                        j = num;
+                } catch (NumberFormatException e) {}
             }
+        }
+        
+        File f = new File("./" + nomeF + (j + 1) + ".na");
+        Random rnd = new Random();
+        try { // riempe il file con 100 numeri casuali
+            bw = new BufferedWriter(new FileWriter(f));
+            for (int i = 0; i < 100; i++)
+                bw.write(Integer.toString((rnd.nextInt(70) - 30)) + "\n");
             bw.flush();
             textArea.read(new FileReader(f), null);
         } catch (IOException ex) {
@@ -301,9 +341,14 @@ public class GUI_dati extends javax.swing.JFrame {
         filePath.setText(f.getAbsolutePath());
     }//GEN-LAST:event_generateFileActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        int somma = 0, min = 41, max = -31, delta, i = 0;
+    /**
+     * Questo ascoltatore calcola la media, il maggiore, il minore e il delta dei numeri
+     * presenti nel file.
+     */
+    private void computeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computeButtonActionPerformed
+        int somma = 0, min = 41, max = -31, delta, i;
         
+        // operazioni per l'analisi del file
         String s[] = textArea.getText().split("\n");
         for (String string : s) {
             i = Integer.valueOf(string);
@@ -313,12 +358,48 @@ public class GUI_dati extends javax.swing.JFrame {
         }
         delta = max - min;
         
+        // modifica delle jLabel con i risultati
         media.setText(Double.toString(somma / s.length));
         minimo.setText(Integer.toString(min));
         massimo.setText(Integer.toString(max));
         this.delta.setText(Integer.toString(delta));
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_computeButtonActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        computeButton.doClick();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jCheckBoxMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMenuItem1ActionPerformed
+        if(jCheckBoxMenuItem1.isSelected())
+            darkMode(true);
+        else
+            darkMode(false);
+    }//GEN-LAST:event_jCheckBoxMenuItem1ActionPerformed
+
+    private void darkMode(boolean state) {
+        if(state) {
+            this.getContentPane().setBackground(Color.darkGray.darker());
+            delta.setForeground(Color.white);
+            jLabel1.setForeground(Color.white);
+            jLabel2.setForeground(Color.white);
+            jLabel3.setForeground(Color.white);
+            jLabel4.setForeground(Color.white);
+            massimo.setForeground(Color.white);
+            media.setForeground(Color.white);
+            minimo.setForeground(Color.white);
+        }
+        else {
+            this.getContentPane().setBackground(defaultBackground);
+            delta.setForeground(Color.black);
+            jLabel1.setForeground(Color.black);
+            jLabel2.setForeground(Color.black);
+            jLabel3.setForeground(Color.black);
+            jLabel4.setForeground(Color.black);
+            massimo.setForeground(Color.black);
+            media.setForeground(Color.black);
+            minimo.setForeground(Color.black);
+        }
+    }
     
     /**
      * @param args the command line arguments
@@ -357,14 +438,14 @@ public class GUI_dati extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem about;
+    private javax.swing.JButton computeButton;
     private javax.swing.JLabel delta;
     private javax.swing.JMenuItem exit;
     private javax.swing.JFileChooser fileChooser;
-    private javax.swing.JDialog fileName;
     private javax.swing.JTextField filePath;
     private javax.swing.JToggleButton generateFile;
     private javax.swing.JMenuItem help;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -373,6 +454,7 @@ public class GUI_dati extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JLabel massimo;
@@ -389,7 +471,7 @@ public class GUI_dati extends javax.swing.JFrame {
  * .java e i .txt
  * 
  * @author Gabriel Duta
- * @since 3.1
+ * @since 1.0
  */
 class MyCustomFilter extends javax.swing.filechooser.FileFilter {
     @Override
