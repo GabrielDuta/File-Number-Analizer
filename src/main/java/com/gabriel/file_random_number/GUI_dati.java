@@ -19,7 +19,6 @@
 package com.gabriel.file_random_number;
 
 import java.awt.Color;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -45,6 +44,7 @@ public class GUI_dati extends javax.swing.JFrame {
     public GUI_dati() {
         initComponents();
         this.setLocation(500, 200);
+        // collegamento dell'ascoltatore del bottone Open Fie all'ascoltatore del MenuItem
         openFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openActionPerformed(evt);
@@ -82,7 +82,7 @@ public class GUI_dati extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         delta = new javax.swing.JLabel();
         filePath = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        computeButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         open = new javax.swing.JMenuItem();
@@ -144,10 +144,10 @@ public class GUI_dati extends javax.swing.JFrame {
 
         filePath.setText("File Path");
 
-        jButton1.setText("Compute");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        computeButton.setText("Compute");
+        computeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                computeButtonActionPerformed(evt);
             }
         });
 
@@ -201,7 +201,7 @@ public class GUI_dati extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(delta, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(filePath, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
+                    .addComponent(computeButton)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -238,7 +238,7 @@ public class GUI_dati extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(computeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
@@ -261,12 +261,18 @@ public class GUI_dati extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Metodo che apre la finestra del file chooser e mostra il contenuto del file scelto
+     * nella textArea.
+     * 
+     * @param evt 
+     */
     private void openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openActionPerformed
-        int returnVal = fileChooser.showOpenDialog(this);
+        int returnVal = fileChooser.showOpenDialog(this); // apre la finestra del file chooser
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
+            File file = fileChooser.getSelectedFile(); // passa all'istanza file il file scelto nel file chooser
             try {
-              // What to do with the file, e.g. display it in a TextArea
+              // Mostra il contenuto del file e il suo path
               textArea.read( new FileReader( file.getAbsolutePath() ), null );
               filePath.setText(file.getAbsolutePath());
             } catch (IOException ex) {
@@ -282,11 +288,15 @@ public class GUI_dati extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_exitActionPerformed
 
+    /**
+     * Genera un file riempiendolo con 100 numeri casuali compresi tra -30 e 40.
+     * @param evt 
+     */
     private void generateFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateFileActionPerformed
         BufferedWriter bw = null;
         File f = new File("./Prova.na");
         Random rnd = new Random();
-        try {
+        try { // riempe il file con 100 numeri casuali
             bw = new BufferedWriter(new FileWriter(f));
             for (int i = 0; i < 100; i++) {
                 bw.write(Integer.toString((rnd.nextInt(70) - 30)));
@@ -301,9 +311,14 @@ public class GUI_dati extends javax.swing.JFrame {
         filePath.setText(f.getAbsolutePath());
     }//GEN-LAST:event_generateFileActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    /**
+     * Questo ascoltatore calcola la media, il maggiore, il minore e il delta dei numeri
+     * presenti nel file.
+     */
+    private void computeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computeButtonActionPerformed
         int somma = 0, min = 41, max = -31, delta, i = 0;
         
+        // operazioni per l'analisi del file
         String s[] = textArea.getText().split("\n");
         for (String string : s) {
             i = Integer.valueOf(string);
@@ -313,11 +328,12 @@ public class GUI_dati extends javax.swing.JFrame {
         }
         delta = max - min;
         
+        // modifica delle jLabel con i risultati
         media.setText(Double.toString(somma / s.length));
         minimo.setText(Integer.toString(min));
         massimo.setText(Integer.toString(max));
         this.delta.setText(Integer.toString(delta));
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_computeButtonActionPerformed
 
     
     /**
@@ -357,6 +373,7 @@ public class GUI_dati extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem about;
+    private javax.swing.JButton computeButton;
     private javax.swing.JLabel delta;
     private javax.swing.JMenuItem exit;
     private javax.swing.JFileChooser fileChooser;
@@ -364,7 +381,6 @@ public class GUI_dati extends javax.swing.JFrame {
     private javax.swing.JTextField filePath;
     private javax.swing.JToggleButton generateFile;
     private javax.swing.JMenuItem help;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -389,7 +405,7 @@ public class GUI_dati extends javax.swing.JFrame {
  * .java e i .txt
  * 
  * @author Gabriel Duta
- * @since 3.1
+ * @since 1.0
  */
 class MyCustomFilter extends javax.swing.filechooser.FileFilter {
     @Override
